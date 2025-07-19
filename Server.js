@@ -51,7 +51,18 @@ const User = mongoose.model("User", userSchema);
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    const { error } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+    if (error) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
